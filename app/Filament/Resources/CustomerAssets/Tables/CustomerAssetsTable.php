@@ -1,0 +1,56 @@
+<?php
+
+namespace App\Filament\Resources\CustomerAssets\Tables;
+
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
+
+class CustomerAssetsTable
+{
+    public static function configure(Table $table): Table
+    {
+        return $table
+            ->columns([
+                TextColumn::make('customer.name')
+                    ->searchable(),
+                TextColumn::make('uploaded_by'),
+                TextColumn::make('connection.id')
+                    ->searchable(),
+                TextColumn::make('disk_driver')
+                    ->searchable(),
+                TextColumn::make('path')
+                    ->searchable(),
+                TextColumn::make('provider_asset_id')
+                    ->searchable(),
+                TextColumn::make('filename')
+                    ->searchable(),
+                TextColumn::make('mime_type')
+                    ->searchable(),
+                TextColumn::make('size_bytes')
+                    ->numeric()
+                    ->sortable(),
+                TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('updated_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->filters([
+                //
+            ])
+            ->recordActions([
+                EditAction::make(),
+            ])
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                ]),
+            ]);
+    }
+}

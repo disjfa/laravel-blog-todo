@@ -1,0 +1,14 @@
+<?php
+
+namespace App\OpenApi\Schemas;
+
+use OpenApi\Attributes as OA;
+
+#[OA\Schema(
+    schema: 'TodoCollection',
+    properties: [
+        new OA\Property(property: 'data', type: 'array', items: new OA\Items(ref: '#/components/schemas/Todo')),
+        new OA\Property(property: 'meta', ref: '#/components/schemas/PaginationMeta'),
+    ],
+)]
+class TodoCollectionSchema {}

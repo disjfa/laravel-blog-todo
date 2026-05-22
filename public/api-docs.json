@@ -1,0 +1,916 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Laravel Blog API",
+        "description": "Customer-scoped Blog and Todo API with social automation.",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "/api/v1",
+            "description": "API v1"
+        }
+    ],
+    "paths": {
+        "/customers/{customer}/blogs": {
+            "get": {
+                "tags": [
+                    "Blogs"
+                ],
+                "summary": "List blogs for a customer",
+                "operationId": "ede73d8afda1679be1ffae320b5d4364",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/customer"
+                    },
+                    {
+                        "$ref": "#/components/parameters/filter"
+                    },
+                    {
+                        "$ref": "#/components/parameters/sort"
+                    },
+                    {
+                        "$ref": "#/components/parameters/include"
+                    },
+                    {
+                        "$ref": "#/components/parameters/page"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated blog list",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BlogCollection"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Blogs"
+                ],
+                "summary": "Create a blog",
+                "operationId": "5c5ac6d1f40fd5f26cedc10f87a106fc",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/customer"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "title",
+                                    "slug",
+                                    "excerpt",
+                                    "content_markdown",
+                                    "status"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "slug": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "excerpt": {
+                                        "type": "string",
+                                        "maxLength": 500
+                                    },
+                                    "content_markdown": {
+                                        "type": "string"
+                                    },
+                                    "status": {
+                                        "$ref": "#/components/schemas/BlogStatus"
+                                    },
+                                    "publish_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Blog"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/customers/{customer}/blogs/{blog}": {
+            "get": {
+                "tags": [
+                    "Blogs"
+                ],
+                "summary": "Get a blog",
+                "operationId": "7a75635dd3f98c3f6d6c1c1d5cb3c88b",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/customer"
+                    },
+                    {
+                        "$ref": "#/components/parameters/blog"
+                    },
+                    {
+                        "$ref": "#/components/parameters/include"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Blog",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Blog"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Blogs"
+                ],
+                "summary": "Delete a blog",
+                "operationId": "323e22769812fcc87ab97008bfa4d807",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/customer"
+                    },
+                    {
+                        "$ref": "#/components/parameters/blog"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Deleted"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Blogs"
+                ],
+                "summary": "Update a blog",
+                "operationId": "7823583bfbea25a5baa7a995e45f6b97",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/customer"
+                    },
+                    {
+                        "$ref": "#/components/parameters/blog"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "slug": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "excerpt": {
+                                        "type": "string",
+                                        "maxLength": 500
+                                    },
+                                    "content_markdown": {
+                                        "type": "string"
+                                    },
+                                    "status": {
+                                        "$ref": "#/components/schemas/BlogStatus"
+                                    },
+                                    "publish_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated blog",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Blog"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/customers/{customer}/todos": {
+            "get": {
+                "tags": [
+                    "Todos"
+                ],
+                "summary": "List todos for a customer",
+                "operationId": "1612dec73a678a040a7e2839e839e4f3",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/customer"
+                    },
+                    {
+                        "$ref": "#/components/parameters/filter"
+                    },
+                    {
+                        "$ref": "#/components/parameters/sort"
+                    },
+                    {
+                        "$ref": "#/components/parameters/include"
+                    },
+                    {
+                        "$ref": "#/components/parameters/page"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated todo list",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TodoCollection"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Todos"
+                ],
+                "summary": "Create a todo",
+                "operationId": "eaef016860b70927895dbacbb35fabe5",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/customer"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "platform_id",
+                                    "title",
+                                    "status",
+                                    "due_at"
+                                ],
+                                "properties": {
+                                    "blog_id": {
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "nullable": true
+                                    },
+                                    "platform_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "title": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "content_markdown": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "status": {
+                                        "$ref": "#/components/schemas/TodoStatus"
+                                    },
+                                    "position": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "due_at": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Todo"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/customers/{customer}/todos/{todo}": {
+            "get": {
+                "tags": [
+                    "Todos"
+                ],
+                "summary": "Get a todo",
+                "operationId": "f5e400eb847012b43dacbf270893ff09",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/customer"
+                    },
+                    {
+                        "$ref": "#/components/parameters/todo"
+                    },
+                    {
+                        "$ref": "#/components/parameters/include"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Todo",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Todo"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Todos"
+                ],
+                "summary": "Delete a todo",
+                "operationId": "1b5f3e1453282cc34e3436d42e435c95",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/customer"
+                    },
+                    {
+                        "$ref": "#/components/parameters/todo"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Deleted"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Todos"
+                ],
+                "summary": "Update a todo",
+                "operationId": "4d653397d6f3bd7c41a3173a0b520040",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/customer"
+                    },
+                    {
+                        "$ref": "#/components/parameters/todo"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "blog_id": {
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "nullable": true
+                                    },
+                                    "platform_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "title": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "content_markdown": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "status": {
+                                        "$ref": "#/components/schemas/TodoStatus"
+                                    },
+                                    "position": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "due_at": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated todo",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Todo"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/customers/{customer}/todos/{todo}/move": {
+            "patch": {
+                "tags": [
+                    "Todos"
+                ],
+                "summary": "Move a todo to a different status/position (Kanban reorder)",
+                "operationId": "599bc6ddcd8347137269faee121aed89",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/customer"
+                    },
+                    {
+                        "$ref": "#/components/parameters/todo"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "position"
+                                ],
+                                "properties": {
+                                    "status": {
+                                        "$ref": "#/components/schemas/TodoStatus"
+                                    },
+                                    "position": {
+                                        "description": "Lexicographic position key within the column",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Moved todo",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Todo"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Author": {
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email"
+                    }
+                },
+                "type": "object"
+            },
+            "BlogCollection": {
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Blog"
+                        }
+                    },
+                    "meta": {
+                        "$ref": "#/components/schemas/PaginationMeta"
+                    }
+                },
+                "type": "object"
+            },
+            "Blog": {
+                "required": [
+                    "id",
+                    "customer_id",
+                    "title",
+                    "slug",
+                    "content_markdown",
+                    "status"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "customer_id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "slug": {
+                        "type": "string"
+                    },
+                    "excerpt": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "content_markdown": {
+                        "type": "string"
+                    },
+                    "content_html": {
+                        "description": "Rendered HTML, computed at response time",
+                        "type": "string"
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/BlogStatus"
+                    },
+                    "publish_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "author": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/Author"
+                            }
+                        ],
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "BlogStatus": {
+                "type": "string",
+                "enum": [
+                    "draft",
+                    "published",
+                    "archived"
+                ]
+            },
+            "PaginationMeta": {
+                "properties": {
+                    "current_page": {
+                        "type": "integer"
+                    },
+                    "last_page": {
+                        "type": "integer"
+                    },
+                    "per_page": {
+                        "type": "integer"
+                    },
+                    "total": {
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "TodoCollection": {
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Todo"
+                        }
+                    },
+                    "meta": {
+                        "$ref": "#/components/schemas/PaginationMeta"
+                    }
+                },
+                "type": "object"
+            },
+            "Todo": {
+                "required": [
+                    "id",
+                    "customer_id",
+                    "title",
+                    "status",
+                    "position",
+                    "due_at"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "customer_id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "blog_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true
+                    },
+                    "platform_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "content_markdown": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "content_html": {
+                        "description": "Rendered HTML, computed at response time",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/TodoStatus"
+                    },
+                    "position": {
+                        "description": "Per-column lexicographic sort key",
+                        "type": "string"
+                    },
+                    "due_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "TodoStatus": {
+                "type": "string",
+                "enum": [
+                    "todo",
+                    "planned",
+                    "in_progress",
+                    "blocked",
+                    "done"
+                ]
+            }
+        },
+        "parameters": {
+            "customer": {
+                "name": "customer",
+                "in": "path",
+                "description": "Customer UUID",
+                "required": true,
+                "schema": {
+                    "type": "string",
+                    "format": "uuid"
+                }
+            },
+            "blog": {
+                "name": "blog",
+                "in": "path",
+                "description": "Blog UUID",
+                "required": true,
+                "schema": {
+                    "type": "string",
+                    "format": "uuid"
+                }
+            },
+            "todo": {
+                "name": "todo",
+                "in": "path",
+                "description": "Todo UUID",
+                "required": true,
+                "schema": {
+                    "type": "string",
+                    "format": "uuid"
+                }
+            },
+            "filter": {
+                "name": "filter",
+                "in": "query",
+                "description": "Spatie Query Builder filter map, e.g. filter[status]=draft",
+                "required": false,
+                "style": "deepObject",
+                "explode": true,
+                "schema": {
+                    "type": "object"
+                }
+            },
+            "sort": {
+                "name": "sort",
+                "in": "query",
+                "description": "Comma-separated sort fields, prefix with - for descending, e.g. -created_at",
+                "required": false,
+                "schema": {
+                    "type": "string"
+                }
+            },
+            "include": {
+                "name": "include",
+                "in": "query",
+                "description": "Comma-separated relations to include in the response",
+                "required": false,
+                "schema": {
+                    "type": "string"
+                }
+            },
+            "page": {
+                "name": "page",
+                "in": "query",
+                "description": "Pagination page number",
+                "required": false,
+                "schema": {
+                    "type": "integer",
+                    "default": 1
+                }
+            }
+        },
+        "securitySchemes": {
+            "sanctum": {
+                "type": "http",
+                "description": "Sanctum bearer token",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Blogs",
+            "description": "Blog CRUD scoped to a customer"
+        },
+        {
+            "name": "Todos",
+            "description": "Todo board scoped to a customer"
+        }
+    ]
+}
