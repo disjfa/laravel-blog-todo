@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Enums\TodoStatus;
+use App\Filament\Concerns\ResolvesCustomerTenant;
 use App\Filament\Resources\Todos\Schemas\TodoForm;
 use App\Models\Todo;
 use BackedEnum;
@@ -16,6 +17,8 @@ use Livewire\Attributes\On;
 
 class TodoKanban extends Page
 {
+    use ResolvesCustomerTenant;
+
     protected string $view = 'filament.pages.todo-kanban';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedViewColumns;
@@ -34,7 +37,8 @@ class TodoKanban extends Page
                 ->icon(Heroicon::OutlinedPlus)
                 ->form(fn (Schema $schema): Schema => TodoForm::configure($schema)->model(Todo::class))
                 ->action(function (array $data): void {
-                    $tenant = Filament::getTenant();
+                    $tenant = $this->getCustomerTenant();
+
                     Todo::create([
                         ...$data,
                         'customer_id' => $tenant->id,
@@ -50,7 +54,7 @@ class TodoKanban extends Page
         return Action::make('editTodo')
             ->form(fn (Schema $schema): Schema => TodoForm::configure($schema)->model(Todo::class))
             ->fillForm(function (array $arguments): array {
-                $tenant = Filament::getTenant();
+                $tenant = $this->getCustomerTenant();
                 $recordId = $arguments['recordId'] ?? null;
 
                 return Todo::query()
@@ -60,7 +64,7 @@ class TodoKanban extends Page
                     ->toArray();
             })
             ->action(function (array $arguments, array $data): void {
-                $tenant = Filament::getTenant();
+                $tenant = $this->getCustomerTenant();
                 $recordId = $arguments['recordId'] ?? null;
 
                 Todo::query()
@@ -82,7 +86,7 @@ class TodoKanban extends Page
 
     protected function records(): Collection
     {
-        $tenant = Filament::getTenant();
+        $tenant = $this->getCustomerTenant();
 
         return Todo::query()
             ->where('customer_id', $tenant->id)
@@ -107,7 +111,7 @@ class TodoKanban extends Page
     #[On('status-changed')]
     public function statusChanged(string $recordId, string $status, array $fromOrderedIds, array $toOrderedIds): void
     {
-        $tenant = Filament::getTenant();
+        $tenant = $this->getCustomerTenant();
 
         Todo::query()
             ->where('id', $recordId)

@@ -2,10 +2,11 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Concerns\ResolvesCustomerTenant;
 use App\Filament\Resources\Todos\TodoResource;
 use App\Models\Todo;
+use Carbon\Carbon;
 use Carbon\CarbonInterface;
-use Filament\Facades\Filament;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
@@ -13,6 +14,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class UpcomingTodosWidget extends BaseWidget
 {
+    use ResolvesCustomerTenant;
+
     protected static ?int $sort = 3;
 
     protected int|string|array $columnSpan = 1;
@@ -21,10 +24,12 @@ class UpcomingTodosWidget extends BaseWidget
 
     public function table(Table $table): Table
     {
+        $tenant = $this->getCustomerTenant();
+
         return $table
             ->query(
                 fn (): Builder => Todo::query()
-                    ->where('customer_id', Filament::getTenant()?->id)
+                    ->where('customer_id', $tenant->id)
                     ->whereNotIn('status', ['done'])
                     ->whereNotNull('due_at')
                     ->where('due_at', '<=', now()->addDays(7))
@@ -62,10 +67,10 @@ class UpcomingTodosWidget extends BaseWidget
                 TextColumn::make('due_at')
                     ->label('Due')
                     ->dateTime('M j, Y')
-                    ->color(fn (Todo $record): string => $record->due_at->isPast() ? 'danger' : 'warning')
-                    ->description(fn (Todo $record): string => $record->due_at->isPast()
-                        ? 'Overdue by '.$record->due_at->diffForHumans(['parts' => 1, 'syntax' => CarbonInterface::DIFF_ABSOLUTE])
-                        : 'Due '.$record->due_at->diffForHumans()
+                    ->color(fn (Todo $record): string => Carbon::parse((string) $record->due_at)->isPast() ? 'danger' : 'warning')
+                    ->description(fn (Todo $record): string => Carbon::parse((string) $record->due_at)->isPast()
+                        ? 'Overdue by '.Carbon::parse((string) $record->due_at)->diffForHumans(['parts' => 1, 'syntax' => CarbonInterface::DIFF_ABSOLUTE])
+                        : 'Due '.Carbon::parse((string) $record->due_at)->diffForHumans()
                     ),
             ])
             ->emptyStateHeading('No upcoming or overdue todos')

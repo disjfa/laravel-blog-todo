@@ -41,6 +41,8 @@ class TodoQuery extends QueryBuilder
 
     public function forBlog(Blog $blog): static
     {
-        return $this->whereBelongsTo($blog);
+        $this->whereBelongsTo($blog);
+
+        return $this;
     }
 }

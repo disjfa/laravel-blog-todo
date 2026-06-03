@@ -9,7 +9,9 @@ trait HasCustomerScope
 {
     public function forCustomer(string|int $customerId): static
     {
-        return $this->where('customer_id', $customerId);
+        $this->where('customer_id', $customerId);
+
+        return $this;
     }
 
     public function forUser(User $user): static
@@ -18,7 +20,9 @@ trait HasCustomerScope
             return $this;
         }
 
-        return $this->whereIn('customer_id', $user->customers()->pluck('customers.id'));
+        $this->whereIn('customer_id', $user->customers()->pluck('customers.id'));
+
+        return $this;
     }
 
     public static function scopeForUser(Builder $query, User $user): Builder

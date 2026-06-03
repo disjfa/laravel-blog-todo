@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Blog;
+use App\Models\Customer;
 use App\Models\CustomerTodoTemplate;
 use App\Models\Todo;
 use Carbon\CarbonInterval;
@@ -19,6 +20,8 @@ class GenerateSocialTodosJob implements ShouldQueue
     public function handle(): void
     {
         $blog = $this->blog;
+
+        /** @var Customer $customer */
         $customer = $blog->customer;
 
         if (! $customer->automation_enabled) {

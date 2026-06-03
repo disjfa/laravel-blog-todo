@@ -2,9 +2,9 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Concerns\ResolvesCustomerTenant;
 use App\Filament\Resources\Blogs\BlogResource;
 use App\Models\Blog;
-use Filament\Facades\Filament;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
@@ -12,6 +12,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class LatestBlogsWidget extends BaseWidget
 {
+    use ResolvesCustomerTenant;
+
     protected static ?int $sort = 2;
 
     protected int|string|array $columnSpan = 1;
@@ -20,10 +22,12 @@ class LatestBlogsWidget extends BaseWidget
 
     public function table(Table $table): Table
     {
+        $tenant = $this->getCustomerTenant();
+
         return $table
             ->query(
                 fn (): Builder => Blog::query()
-                    ->where('customer_id', Filament::getTenant()?->id)
+                    ->where('customer_id', $tenant->id)
                     ->latest()
             )
             ->columns([
