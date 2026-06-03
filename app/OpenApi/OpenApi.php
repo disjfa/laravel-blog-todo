@@ -20,6 +20,7 @@ use OpenApi\Attributes as OA;
 #[OA\Tag(name: 'Blogs', description: 'Blog CRUD scoped to a customer')]
 #[OA\Tag(name: 'Todos', description: 'Todo board scoped to a customer')]
 #[OA\Tag(name: 'Me', description: 'Authenticated user context')]
+#[OA\Tag(name: 'Customers', description: 'Customers the authenticated user belongs to')]
 
 // ── Shared parameter components ────────────────────────────────────────────
 

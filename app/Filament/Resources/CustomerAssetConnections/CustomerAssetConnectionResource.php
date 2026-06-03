@@ -22,6 +22,11 @@ class CustomerAssetConnectionResource extends Resource
 
     protected static bool $isScopedToTenant = false;
 
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Admin Area';
+    }
+
     public static function form(Schema $schema): Schema
     {
         return CustomerAssetConnectionForm::configure($schema);

@@ -26,40 +26,53 @@ class GenerateSocialTodosJob implements ShouldQueue
         }
 
         $templates = CustomerTodoTemplate::query()
-            ->where('customer_id', $customer->id)
+            ->whereBelongsTo($customer)
             ->where('is_active', true)
             ->get();
 
         foreach ($templates as $template) {
-            try {
-                $dueAt = $this->resolveDueDate($blog, $template);
-            } catch (\Throwable $e) {
-                Log::error('GenerateSocialTodosJob: failed to compute due date', [
-                    'blog_id' => $blog->id,
-                    'template_id' => $template->id,
-                    'error' => $e->getMessage(),
-                ]);
-                $this->fail($e);
-
-                return;
-            }
-
-            Todo::firstOrCreate(
-                [
-                    'blog_id' => $blog->id,
-                    'customer_id' => $customer->id,
-                    'generated_from_template_id' => $template->id,
-                ],
-                [
-                    'platform_id' => $template->platform_id,
-                    'title' => $template->title_template,
-                    'content_markdown' => $template->body_template,
-                    'status' => $template->default_status,
-                    'position' => '0',
-                    'due_at' => $dueAt,
-                ]
-            );
+            $this->createTodoFromTemplate($blog, $template);
         }
+    }
+
+    private function createTodoFromTemplate(Blog $blog, CustomerTodoTemplate $template): void
+    {
+        $existing = Todo::query()
+            ->whereBelongsTo($blog)
+            ->whereBelongsTo($blog->customer)
+            ->where('generated_from_template_id', $template->id)
+            ->exists();
+
+        if ($existing) {
+            return;
+        }
+
+        try {
+            $dueAt = $this->resolveDueDate($blog, $template);
+        } catch (\Throwable $e) {
+            Log::error('GenerateSocialTodosJob: failed to compute due date', [
+                'blog_id' => $blog->id,
+                'template_id' => $template->id,
+                'error' => $e->getMessage(),
+            ]);
+            $this->fail($e);
+
+            return;
+        }
+
+        $todo = new Todo([
+            'title' => $template->title_template,
+            'content_markdown' => $template->body_template,
+            'status' => $template->default_status,
+            'position' => '0',
+            'due_at' => $dueAt,
+        ]);
+
+        $todo->blog()->associate($blog);
+        $todo->customer()->associate($blog->customer);
+        $todo->platform()->associate($template->platform);
+        $todo->generatedFromTemplate()->associate($template);
+        $todo->save();
     }
 
     private function resolveDueDate(Blog $blog, CustomerTodoTemplate $template): \DateTimeInterface

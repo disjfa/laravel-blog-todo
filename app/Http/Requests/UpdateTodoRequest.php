@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\TodoStatus;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -21,7 +22,7 @@ class UpdateTodoRequest extends FormRequest
             'platform_id' => ['sometimes', 'required', 'uuid', Rule::exists('platforms', 'id')],
             'title' => 'sometimes|required|string|max:255',
             'content_markdown' => 'nullable|string',
-            'status' => ['sometimes', 'required', Rule::in(['todo', 'planned', 'in_progress', 'blocked', 'done'])],
+            'status' => ['sometimes', 'required', Rule::enum(TodoStatus::class)],
             'position' => 'nullable|string|max:255',
             'due_at' => 'sometimes|required|date_format:Y-m-d H:i:s',
         ];

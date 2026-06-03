@@ -1,6 +1,6 @@
 ## Plan: Customer-Scoped Blog CMS + Automation
 
-Status: in progress — Phases 1–10 complete; Phase 11 (OpenAPI) and Phase 12 (tests/CI) remaining
+Status: in progress — Phases 1–11 complete; Phase 12 (tests/CI) remaining
 
 Legend: ✅ done · ⏳ pending · 🔲 not started
 
@@ -70,12 +70,12 @@ Create a Laravel app with customer-scoped Blog and Todo Kanban modules using pol
 61. ✅ Admin-only resources (Users, Platforms, CustomerAssetConnections, Customers) set `$isScopedToTenant = false` with dedicated policies returning false for non-admins.
 62. ✅ Tailwind v4 + @tailwindcss/vite wired; Filament custom theme at `resources/css/filament/admin/theme.css` compiled via Vite.
 63. ✅ Dashboard widgets: LatestBlogsWidget (50% width, links to edit) and UpcomingTodosWidget (50% width, overdue + due ≤7 days, links to edit).
-64. 🔲 Phase 11 - OpenAPI docs.
-65. 🔲 Annotate API endpoints and schemas with attributes.
-66. 🔲 Expose public Swagger UI at api/docs backed by generated OpenAPI JSON.
-67. 🔲 Document Query Builder contracts (filter, sort, include, pagination) for Blog and Todo endpoints.
-68. 🔲 Document automation-related endpoints/resources for customer social template setup.
-69. 🔲 Document Blog asset endpoints and response fields (driver type, file metadata, remote URL/public id) without exposing secrets.
+64. ✅ Phase 11 - OpenAPI docs.
+65. ✅ Annotate API endpoints and schemas with attributes.
+66. ✅ Expose public Swagger UI at api/docs backed by generated OpenAPI JSON.
+67. ✅ Document Query Builder contracts (filter, sort, include, pagination) for Blog and Todo endpoints.
+68. ✅ Document /me and /customers endpoints (extracted closures to MeController and CustomerListController); automation templates and assets are Filament-admin-only — no public API routes.
+69. ✅ Document Blog asset fields in BlogSchema (assets array, public_url, provider_asset_id); asset upload/management is Filament-admin-only — no public API routes.
 70. 🔲 Phase 12 - Verification and CI.
 71. 🔲 Add Pest tests for role/membership policy matrix across Blog and Todo.
 72. 🔲 Add parity tests proving admin/API share FormRequests and query behavior.
@@ -272,6 +272,10 @@ Rules learned during implementation that apply to all future work on this projec
 #### Code style
 - Run `./vendor/bin/pint` after every batch of changes.
 
+#### Eloquent best practices
+- Prefer `whereBelongsTo($model)` over manual foreign-key `where()` clauses when filtering by model relationships.
+- When creating connected models, prefer relation methods with `associate()` (for example `->blog()->associate($blog)`) instead of writing raw foreign key values directly.
+
 #### OpenAPI
 - Use `zircote/swagger-php ^6` with PHP 8 Attributes style (`OpenApi\Attributes as OA`).
 - Generate docs via the CLI binary, not the PHP `Generator` class: `./vendor/bin/openapi app/OpenApi app/Http/Controllers/Api --output public/api-docs.json --format json`
@@ -280,6 +284,10 @@ Rules learned during implementation that apply to all future work on this projec
 - **Each schema must be its own class** in `app/OpenApi/Schemas/`. Stacking multiple `#[OA\Schema]` attributes on a single class causes swagger-php v6 to silently drop all but the first schema — they will not appear in `components.schemas`.
 - `ApiDocsController::json()` serves the pre-generated `public/api-docs.json` file. Regenerate with `composer docs` before deploying or in CI.
 - Scan paths: `app/OpenApi` and `app/Http/Controllers/Api`.
+
+#### Impersonation
+- Use `stechstudio/filament-impersonate` for admin impersonation actions in Filament resources/pages.
+- Do not use direct `lab404/laravel-impersonate` manager calls in application code.
 
 #### Seeders
 - `DatabaseSeeder` is the single entry point: `RoleSeeder → PlatformSeeder → AdminUserSeeder`.

@@ -2,13 +2,12 @@
 
 namespace App\Filament\Resources\Users\Tables;
 
-use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Lab404\Impersonate\Services\ImpersonateManager;
+use STS\FilamentImpersonate\Actions\Impersonate;
 
 class UsersTable
 {
@@ -34,16 +33,7 @@ class UsersTable
                 //
             ])
             ->recordActions([
-                Action::make('impersonate')
-                    ->label('Impersonate')
-                    ->icon('heroicon-o-identification')
-                    ->color('warning')
-                    ->visible(fn ($record) => auth()->user()?->canImpersonate() && $record->canBeImpersonated())
-                    ->action(function ($record) {
-                        app(ImpersonateManager::class)->take(auth()->user(), $record);
-
-                        return redirect('/admin');
-                    }),
+                Impersonate::make()->redirectTo('/admin'),
                 EditAction::make(),
             ])
             ->toolbarActions([

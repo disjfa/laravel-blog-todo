@@ -52,10 +52,9 @@ class BlogController extends Controller
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
-                required: ['title', 'slug', 'excerpt', 'content_markdown', 'status'],
+                required: ['title', 'excerpt', 'content_markdown', 'status'],
                 properties: [
                     new OA\Property(property: 'title', type: 'string', maxLength: 255),
-                    new OA\Property(property: 'slug', type: 'string', maxLength: 255),
                     new OA\Property(property: 'excerpt', type: 'string', maxLength: 500),
                     new OA\Property(property: 'content_markdown', type: 'string'),
                     new OA\Property(property: 'status', ref: '#/components/schemas/BlogStatus'),
@@ -80,7 +79,7 @@ class BlogController extends Controller
             'updated_by' => $request->user()->id,
         ]);
 
-        return response()->json(BlogResource::make($blog), 201);
+        return BlogResource::make($blog)->response()->setStatusCode(201);
     }
 
     #[OA\Get(
@@ -120,7 +119,6 @@ class BlogController extends Controller
             content: new OA\JsonContent(
                 properties: [
                     new OA\Property(property: 'title', type: 'string', maxLength: 255),
-                    new OA\Property(property: 'slug', type: 'string', maxLength: 255),
                     new OA\Property(property: 'excerpt', type: 'string', maxLength: 500),
                     new OA\Property(property: 'content_markdown', type: 'string'),
                     new OA\Property(property: 'status', ref: '#/components/schemas/BlogStatus'),

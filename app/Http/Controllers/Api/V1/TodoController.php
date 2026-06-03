@@ -81,7 +81,7 @@ class TodoController extends Controller
             'updated_by' => $request->user()->id,
         ]);
 
-        return response()->json(TodoResource::make($todo), 201);
+        return TodoResource::make($todo)->response()->setStatusCode(201);
     }
 
     #[OA\Get(

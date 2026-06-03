@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\SetsUserStamps;
 use App\Observers\BlogObserver;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -16,7 +17,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[ObservedBy(BlogObserver::class)]
 class Blog extends Model
 {
-    use HasFactory, HasUuids;
+    use HasFactory, HasUuids, SetsUserStamps;
 
     protected function casts(): array
     {

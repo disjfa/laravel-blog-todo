@@ -26,7 +26,7 @@ class CustomerObserver
         $i = 1;
 
         while (Customer::where('slug', $slug)->where('id', '!=', $customer->id ?? '')->exists()) {
-            $slug = $base . '-' . $i++;
+            $slug = $base.'-'.$i++;
         }
 
         return $slug;

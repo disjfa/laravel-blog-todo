@@ -15,7 +15,7 @@ class CustomerAssetPolicy
 
     public function viewAny(User $user): bool
     {
-        return (bool)$user->hasRole(['admin', 'customer']);
+        return (bool) $user->hasRole(['admin', 'customer']);
     }
 
     public function view(User $user, CustomerAsset $asset): bool

@@ -16,7 +16,6 @@ class StoreBlogRequest extends FormRequest
     {
         return [
             'title' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:blogs,slug',
             'excerpt' => 'required|string|max:500',
             'content_markdown' => 'required|string',
             'status' => ['required', Rule::in(['draft', 'published', 'archived'])],

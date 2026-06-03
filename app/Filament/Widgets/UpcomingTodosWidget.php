@@ -4,6 +4,7 @@ namespace App\Filament\Widgets;
 
 use App\Filament\Resources\Todos\TodoResource;
 use App\Models\Todo;
+use Carbon\CarbonInterface;
 use Filament\Facades\Filament;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -38,20 +39,20 @@ class UpcomingTodosWidget extends BaseWidget
                 TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'todo'        => 'gray',
-                        'planned'     => 'info',
+                        'todo' => 'gray',
+                        'planned' => 'info',
                         'in_progress' => 'warning',
-                        'blocked'     => 'danger',
-                        'done'        => 'success',
-                        default       => 'gray',
+                        'blocked' => 'danger',
+                        'done' => 'success',
+                        default => 'gray',
                     })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'todo'        => 'Todo',
-                        'planned'     => 'Planned',
+                        'todo' => 'Todo',
+                        'planned' => 'Planned',
                         'in_progress' => 'In Progress',
-                        'blocked'     => 'Blocked',
-                        'done'        => 'Done',
-                        default       => $state,
+                        'blocked' => 'Blocked',
+                        'done' => 'Done',
+                        default => $state,
                     }),
 
                 TextColumn::make('platform.name')
@@ -63,8 +64,8 @@ class UpcomingTodosWidget extends BaseWidget
                     ->dateTime('M j, Y')
                     ->color(fn (Todo $record): string => $record->due_at->isPast() ? 'danger' : 'warning')
                     ->description(fn (Todo $record): string => $record->due_at->isPast()
-                        ? 'Overdue by ' . $record->due_at->diffForHumans(['parts' => 1, 'syntax' => \Carbon\CarbonInterface::DIFF_ABSOLUTE])
-                        : 'Due ' . $record->due_at->diffForHumans()
+                        ? 'Overdue by '.$record->due_at->diffForHumans(['parts' => 1, 'syntax' => CarbonInterface::DIFF_ABSOLUTE])
+                        : 'Due '.$record->due_at->diffForHumans()
                     ),
             ])
             ->emptyStateHeading('No upcoming or overdue todos')

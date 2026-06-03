@@ -20,6 +20,11 @@ class BlogResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedNewspaper;
 
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Customer';
+    }
+
     public static function form(Schema $schema): Schema
     {
         return BlogForm::configure($schema);

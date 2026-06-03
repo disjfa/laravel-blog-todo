@@ -35,11 +35,11 @@ class LatestBlogsWidget extends BaseWidget
                 TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'draft'     => 'gray',
+                        'draft' => 'gray',
                         'published' => 'success',
                         'scheduled' => 'info',
-                        'archived'  => 'warning',
-                        default     => 'gray',
+                        'archived' => 'warning',
+                        default => 'gray',
                     }),
 
                 TextColumn::make('publish_at')

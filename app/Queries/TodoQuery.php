@@ -2,6 +2,7 @@
 
 namespace App\Queries;
 
+use App\Models\Blog;
 use App\Models\Todo;
 use App\Queries\Concerns\HasCustomerScope;
 use Illuminate\Database\Eloquent\Builder;
@@ -16,30 +17,30 @@ class TodoQuery extends QueryBuilder
         parent::__construct($query ?? Todo::query());
 
         $this
-            ->allowedFilters([
+            ->allowedFilters(
                 'title',
                 'status',
                 'platform_id',
                 'blog_id',
-            ])
-            ->allowedIncludes([
+            )
+            ->allowedIncludes(
                 'customer',
                 'blog',
                 'platform',
                 'creator',
-            ])
-            ->allowedSorts([
+            )
+            ->allowedSorts(
                 'title',
                 'status',
                 'position',
                 'due_at',
                 'created_at',
                 'updated_at',
-            ]);
+            );
     }
 
-    public function forBlog(string $blogId): static
+    public function forBlog(Blog $blog): static
     {
-        return $this->where('blog_id', $blogId);
+        return $this->whereBelongsTo($blog);
     }
 }

@@ -10,13 +10,13 @@
         "cloudinary/cloudinary_php": "^3.1",
         "filament/filament": "^5.6",
         "graham-campbell/markdown": "^16.1",
-        "lab404/laravel-impersonate": "^1.7",
         "laravel/framework": "^13.8",
         "laravel/sanctum": "^4.3",
         "laravel/tinker": "^3.0",
         "spatie/eloquent-sortable": "^5.0",
         "spatie/laravel-permission": "^7.4",
         "spatie/laravel-query-builder": "^7.3",
+        "stechstudio/filament-impersonate": "^5.5",
         "zircote/swagger-php": "^6.1"
     },
     "require-dev": {
@@ -57,6 +57,17 @@
         "test": [
             "@php artisan config:clear --ansi @no_additional_args",
             "@php artisan test"
+        ],
+        "format": [
+            "@php vendor/bin/pint"
+        ],
+        "pint": [
+            "@php vendor/bin/pint --test"
+        ],
+        "pre-commit": [
+            "@format",
+            "@pint",
+            "@test"
         ],
         "docs": [
             "./vendor/bin/openapi app/OpenApi app/Http/Controllers/Api --output public/api-docs.json --format json"

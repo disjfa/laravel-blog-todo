@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\SetsUserStamps;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\EloquentSortable\Sortable;
@@ -13,7 +15,7 @@ use Spatie\EloquentSortable\SortableTrait;
 #[Fillable(['customer_id', 'blog_id', 'platform_id', 'title', 'content_markdown', 'status', 'position', 'due_at', 'created_by', 'updated_by', 'generated_from_template_id'])]
 class Todo extends Model implements Sortable
 {
-    use HasUuids, SortableTrait;
+    use HasFactory, HasUuids, SetsUserStamps, SortableTrait;
 
     public array $sortable = [
         'order_column_name' => 'position',
@@ -52,5 +54,10 @@ class Todo extends Model implements Sortable
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function generatedFromTemplate(): BelongsTo
+    {
+        return $this->belongsTo(CustomerTodoTemplate::class, 'generated_from_template_id');
     }
 }

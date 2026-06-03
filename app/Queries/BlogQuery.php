@@ -16,22 +16,22 @@ class BlogQuery extends QueryBuilder
         parent::__construct($query ?? Blog::query());
 
         $this
-            ->allowedFilters([
+            ->allowedFilters(
                 'title',
                 'status',
                 'slug',
-            ])
-            ->allowedIncludes([
+            )
+            ->allowedIncludes(
                 'customer',
                 'author',
                 'assets',
-            ])
-            ->allowedSorts([
+            )
+            ->allowedSorts(
                 'title',
                 'status',
                 'created_at',
                 'updated_at',
                 'publish_at',
-            ]);
+            );
     }
 }

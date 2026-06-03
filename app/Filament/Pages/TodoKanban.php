@@ -2,17 +2,14 @@
 
 namespace App\Filament\Pages;
 
-use App\Models\Blog;
-use App\Models\Platform;
+use App\Enums\TodoStatus;
+use App\Filament\Resources\Todos\Schemas\TodoForm;
 use App\Models\Todo;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
 use Filament\Pages\Page;
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\On;
@@ -35,7 +32,7 @@ class TodoKanban extends Page
             Action::make('createTodo')
                 ->label('New Todo')
                 ->icon(Heroicon::OutlinedPlus)
-                ->form($this->todoFormFields())
+                ->form(fn (Schema $schema): Schema => TodoForm::configure($schema)->model(Todo::class))
                 ->action(function (array $data): void {
                     $tenant = Filament::getTenant();
                     Todo::create([
@@ -48,63 +45,39 @@ class TodoKanban extends Page
         ];
     }
 
-    public function editTodo(string $recordId): Action
+    public function editTodo(): Action
     {
         return Action::make('editTodo')
-            ->form($this->todoFormFields())
-            ->fillForm(fn (): array => Todo::findOrFail($recordId)->toArray())
-            ->action(function (array $data) use ($recordId): void {
-                Todo::findOrFail($recordId)->update([
-                    ...$data,
-                    'updated_by' => auth()->id(),
-                ]);
+            ->form(fn (Schema $schema): Schema => TodoForm::configure($schema)->model(Todo::class))
+            ->fillForm(function (array $arguments): array {
+                $tenant = Filament::getTenant();
+                $recordId = $arguments['recordId'] ?? null;
+
+                return Todo::query()
+                    ->whereKey($recordId)
+                    ->where('customer_id', $tenant->id)
+                    ->firstOrFail()
+                    ->toArray();
+            })
+            ->action(function (array $arguments, array $data): void {
+                $tenant = Filament::getTenant();
+                $recordId = $arguments['recordId'] ?? null;
+
+                Todo::query()
+                    ->whereKey($recordId)
+                    ->where('customer_id', $tenant->id)
+                    ->firstOrFail()
+                    ->update([
+                        ...$data,
+                        'updated_by' => auth()->id(),
+                    ]);
             })
             ->modalHeading('Edit Todo');
     }
 
-    private function todoFormFields(): array
-    {
-        $tenant = Filament::getTenant();
-
-        return [
-            TextInput::make('title')
-                ->required()
-                ->columnSpanFull(),
-            Select::make('status')
-                ->options([
-                    'todo' => 'Todo',
-                    'planned' => 'Planned',
-                    'in_progress' => 'In Progress',
-                    'blocked' => 'Blocked',
-                    'done' => 'Done',
-                ])
-                ->default('todo')
-                ->required(),
-            Select::make('platform_id')
-                ->label('Platform')
-                ->options(Platform::pluck('name', 'id'))
-                ->searchable(),
-            Select::make('blog_id')
-                ->label('Blog')
-                ->options(Blog::where('customer_id', $tenant->id)->pluck('title', 'id'))
-                ->searchable(),
-            DateTimePicker::make('due_at')
-                ->required(),
-            Textarea::make('content_markdown')
-                ->label('Content')
-                ->columnSpanFull(),
-        ];
-    }
-
     protected function statuses(): Collection
     {
-        return collect([
-            ['id' => 'todo', 'title' => 'Todo', 'color' => 'gray'],
-            ['id' => 'planned', 'title' => 'Planned', 'color' => 'blue'],
-            ['id' => 'in_progress', 'title' => 'In Progress', 'color' => 'yellow'],
-            ['id' => 'blocked', 'title' => 'Blocked', 'color' => 'red'],
-            ['id' => 'done', 'title' => 'Done', 'color' => 'green'],
-        ]);
+        return collect(TodoStatus::kanbanColumns());
     }
 
     protected function records(): Collection

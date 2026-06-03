@@ -75,17 +75,12 @@
                             "schema": {
                                 "required": [
                                     "title",
-                                    "slug",
                                     "excerpt",
                                     "content_markdown",
                                     "status"
                                 ],
                                 "properties": {
                                     "title": {
-                                        "type": "string",
-                                        "maxLength": 255
-                                    },
-                                    "slug": {
                                         "type": "string",
                                         "maxLength": 255
                                     },
@@ -229,10 +224,6 @@
                                         "type": "string",
                                         "maxLength": 255
                                     },
-                                    "slug": {
-                                        "type": "string",
-                                        "maxLength": 255
-                                    },
                                     "excerpt": {
                                         "type": "string",
                                         "maxLength": 500
@@ -270,6 +261,67 @@
                     },
                     "422": {
                         "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/customers": {
+            "get": {
+                "tags": [
+                    "Customers"
+                ],
+                "summary": "List customers the authenticated user belongs to",
+                "operationId": "2b03df5f8adb12d85244a52290db2e03",
+                "responses": {
+                    "200": {
+                        "description": "List of customers",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Customer"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/me": {
+            "get": {
+                "tags": [
+                    "Me"
+                ],
+                "summary": "Get the authenticated user with their customers",
+                "operationId": "b0b8ca3a2b079ce9f6768f1558f52125",
+                "responses": {
+                    "200": {
+                        "description": "Authenticated user with customers",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Me"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
                     }
                 },
                 "security": [
@@ -719,6 +771,63 @@
                     "archived"
                 ]
             },
+            "Customer": {
+                "required": [
+                    "id",
+                    "name",
+                    "slug"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "slug": {
+                        "type": "string"
+                    },
+                    "automation_enabled": {
+                        "type": "boolean"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "Me": {
+                "required": [
+                    "id",
+                    "name",
+                    "email"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "customers": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Customer"
+                        }
+                    }
+                },
+                "type": "object"
+            },
             "PaginationMeta": {
                 "properties": {
                     "current_page": {
@@ -911,6 +1020,14 @@
         {
             "name": "Todos",
             "description": "Todo board scoped to a customer"
+        },
+        {
+            "name": "Me",
+            "description": "Authenticated user context"
+        },
+        {
+            "name": "Customers",
+            "description": "Customers the authenticated user belongs to"
         }
     ]
 }

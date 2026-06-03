@@ -9,6 +9,7 @@ use App\Filament\Resources\CustomerTodoTemplates\Schemas\CustomerTodoTemplateFor
 use App\Filament\Resources\CustomerTodoTemplates\Tables\CustomerTodoTemplatesTable;
 use App\Models\CustomerTodoTemplate;
 use BackedEnum;
+use Filament\Facades\Filament;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -19,6 +20,25 @@ class CustomerTodoTemplateResource extends Resource
     protected static ?string $model = CustomerTodoTemplate::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentList;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Customer';
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        $tenant = Filament::getTenant();
+
+        if (! $tenant) {
+            return null;
+        }
+
+        return (string) CustomerTodoTemplate::query()
+            ->whereBelongsTo($tenant)
+            ->where('is_active', true)
+            ->count();
+    }
 
     public static function form(Schema $schema): Schema
     {

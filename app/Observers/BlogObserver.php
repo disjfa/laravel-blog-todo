@@ -32,7 +32,7 @@ class BlogObserver
         $i = 1;
 
         while (Blog::where('slug', $slug)->where('id', '!=', $blog->id ?? '')->exists()) {
-            $slug = $base . '-' . $i++;
+            $slug = $base.'-'.$i++;
         }
 
         return $slug;

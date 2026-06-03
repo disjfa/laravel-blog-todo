@@ -20,6 +20,11 @@ class CustomerAssetResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPhoto;
 
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Customer';
+    }
+
     public static function form(Schema $schema): Schema
     {
         return CustomerAssetForm::configure($schema);

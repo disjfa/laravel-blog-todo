@@ -26,7 +26,7 @@ class PlatformObserver
         $i = 1;
 
         while (Platform::where('slug', $slug)->where('id', '!=', $platform->id ?? '')->exists()) {
-            $slug = $base . '-' . $i++;
+            $slug = $base.'-'.$i++;
         }
 
         return $slug;
