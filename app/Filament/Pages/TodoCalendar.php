@@ -10,7 +10,6 @@ use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Pages\Page;
 use Filament\Schemas\Schema;
-use Filament\Support\Enums\Width;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Collection;
 
