@@ -20,8 +20,16 @@ class BlogObserver
         }
     }
 
-    public function created(Blog $blog): void
+    public function updated(Blog $blog): void
     {
+        if (! $blog->wasChanged(['status', 'publish_at'])) {
+            return;
+        }
+
+        if ($blog->status !== 'published' || blank($blog->publish_at)) {
+            return;
+        }
+
         GenerateSocialTodosJob::dispatch($blog);
     }
 

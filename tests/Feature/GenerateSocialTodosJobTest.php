@@ -10,6 +10,7 @@ use App\Models\Platform;
 use App\Models\Todo;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 class GenerateSocialTodosJobTest extends TestCase
@@ -34,6 +35,8 @@ class GenerateSocialTodosJobTest extends TestCase
         $blog = Blog::factory()->create([
             'customer_id' => $customer->id,
             'created_by' => $user->id,
+            'status' => 'draft',
+            'publish_at' => null,
         ]);
 
         return [$customer, $template, $blog];
@@ -41,8 +44,13 @@ class GenerateSocialTodosJobTest extends TestCase
 
     public function test_job_creates_todos_from_active_templates(): void
     {
-        // Blog observer dispatches the job synchronously (QUEUE_CONNECTION=sync in tests)
         [$customer, $template, $blog] = $this->makeCustomerWithTemplate();
+
+        // Observer now dispatches only when a blog is updated to published with publish_at set.
+        $blog->update([
+            'status' => 'published',
+            'publish_at' => now(),
+        ]);
 
         $this->assertDatabaseHas('todos', [
             'blog_id' => $blog->id,
@@ -55,7 +63,12 @@ class GenerateSocialTodosJobTest extends TestCase
     {
         [$customer, $template, $blog] = $this->makeCustomerWithTemplate();
 
-        // Run the job a second time manually
+        $blog->update([
+            'status' => 'published',
+            'publish_at' => now(),
+        ]);
+
+        // Run the job a second time manually.
         (new GenerateSocialTodosJob($blog->fresh()))->handle();
 
         $this->assertSame(
@@ -68,7 +81,7 @@ class GenerateSocialTodosJobTest extends TestCase
 
     public function test_job_skips_when_automation_disabled(): void
     {
-        // Create customer with automation disabled; blog observer still dispatches, but job should no-op
+        // Create customer with automation disabled.
         $customer = Customer::factory()->create(['automation_enabled' => false]);
         $platform = Platform::first();
         $user = User::factory()->create();
@@ -82,7 +95,17 @@ class GenerateSocialTodosJobTest extends TestCase
             'is_active' => true,
         ]);
 
-        $blog = Blog::factory()->create(['customer_id' => $customer->id, 'created_by' => $user->id]);
+        $blog = Blog::factory()->create([
+            'customer_id' => $customer->id,
+            'created_by' => $user->id,
+            'status' => 'draft',
+            'publish_at' => null,
+        ]);
+
+        $blog->update([
+            'status' => 'published',
+            'publish_at' => now(),
+        ]);
 
         $this->assertDatabaseMissing('todos', ['blog_id' => $blog->id]);
     }
@@ -91,6 +114,11 @@ class GenerateSocialTodosJobTest extends TestCase
     {
         [$customer, $template, $blog] = $this->makeCustomerWithTemplate();
 
+        $blog->update([
+            'status' => 'published',
+            'publish_at' => now(),
+        ]);
+
         $todo = Todo::where('blog_id', $blog->id)->firstOrFail();
         $this->assertNotNull($todo->due_at);
     }
@@ -98,6 +126,11 @@ class GenerateSocialTodosJobTest extends TestCase
     public function test_job_skips_when_generated_todo_already_exists(): void
     {
         [$customer, $template, $blog] = $this->makeCustomerWithTemplate();
+
+        $blog->update([
+            'status' => 'published',
+            'publish_at' => now(),
+        ]);
 
         $existing = Todo::query()
             ->where('blog_id', $blog->id)
@@ -120,6 +153,11 @@ class GenerateSocialTodosJobTest extends TestCase
     public function test_job_creates_todo_when_missing_for_template(): void
     {
         [$customer, $template, $blog] = $this->makeCustomerWithTemplate();
+
+        $blog->update([
+            'status' => 'published',
+            'publish_at' => now(),
+        ]);
 
         Todo::query()
             ->where('blog_id', $blog->id)
@@ -151,8 +189,60 @@ class GenerateSocialTodosJobTest extends TestCase
             'is_active' => false,
         ]);
 
-        $blog = Blog::factory()->create(['customer_id' => $customer->id, 'created_by' => $user->id]);
+        $blog = Blog::factory()->create([
+            'customer_id' => $customer->id,
+            'created_by' => $user->id,
+            'status' => 'draft',
+            'publish_at' => null,
+        ]);
+
+        $blog->update([
+            'status' => 'published',
+            'publish_at' => now(),
+        ]);
 
         $this->assertDatabaseMissing('todos', ['blog_id' => $blog->id]);
+    }
+
+    public function test_job_skips_when_blog_publish_date_is_older_than_one_week(): void
+    {
+        [$customer, $template, $blog] = $this->makeCustomerWithTemplate();
+
+        $blog->update([
+            'status' => 'published',
+            'publish_at' => Carbon::now()->subDays(8),
+        ]);
+
+        $this->assertDatabaseMissing('todos', [
+            'blog_id' => $blog->id,
+            'generated_from_template_id' => $template->id,
+        ]);
+    }
+
+    public function test_job_skips_when_any_todo_is_already_connected_to_blog(): void
+    {
+        [$customer, $template, $blog] = $this->makeCustomerWithTemplate();
+
+        Todo::create([
+            'customer_id' => $customer->id,
+            'blog_id' => $blog->id,
+            'title' => 'Existing todo',
+            'content_markdown' => 'Already connected',
+            'status' => 'todo',
+            'position' => 0,
+            'due_at' => now()->addDay(),
+            'created_by' => $blog->created_by,
+        ]);
+
+        $blog->update([
+            'status' => 'published',
+            'publish_at' => now(),
+        ]);
+
+        $this->assertSame(1, Todo::query()->where('blog_id', $blog->id)->count());
+        $this->assertDatabaseMissing('todos', [
+            'blog_id' => $blog->id,
+            'generated_from_template_id' => $template->id,
+        ]);
     }
 }

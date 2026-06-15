@@ -22,6 +22,7 @@ class StoreTodoRequest extends FormRequest
             'platform_id' => ['required', 'uuid', Rule::exists('platforms', 'id')],
             'title' => 'required|string|max:255',
             'content_markdown' => 'nullable|string',
+            'external_url' => 'nullable|url|max:2048',
             'status' => ['required', Rule::enum(TodoStatus::class)],
             'position' => 'nullable|string|max:255',
             'due_at' => 'required|date_format:Y-m-d H:i:s',

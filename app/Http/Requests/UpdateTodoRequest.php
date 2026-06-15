@@ -22,6 +22,7 @@ class UpdateTodoRequest extends FormRequest
             'platform_id' => ['sometimes', 'required', 'uuid', Rule::exists('platforms', 'id')],
             'title' => 'sometimes|required|string|max:255',
             'content_markdown' => 'nullable|string',
+            'external_url' => 'nullable|url|max:2048',
             'status' => ['sometimes', 'required', Rule::enum(TodoStatus::class)],
             'position' => 'nullable|string|max:255',
             'due_at' => 'sometimes|required|date_format:Y-m-d H:i:s',

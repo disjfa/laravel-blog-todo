@@ -8,9 +8,9 @@ use App\Filament\Resources\Todos\Schemas\TodoForm;
 use App\Models\Todo;
 use BackedEnum;
 use Filament\Actions\Action;
-use Filament\Facades\Filament;
 use Filament\Pages\Page;
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\Width;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\On;
@@ -28,6 +28,8 @@ class TodoKanban extends Page
     protected static ?string $title = 'Todo Kanban';
 
     protected static ?int $navigationSort = 2;
+
+    protected string|Width|null $maxContentWidth = Width::Full;
 
     protected function getHeaderActions(): array
     {

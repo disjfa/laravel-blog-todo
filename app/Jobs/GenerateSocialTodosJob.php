@@ -9,6 +9,7 @@ use App\Models\Todo;
 use Carbon\CarbonInterval;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class GenerateSocialTodosJob implements ShouldQueue
@@ -20,6 +21,21 @@ class GenerateSocialTodosJob implements ShouldQueue
     public function handle(): void
     {
         $blog = $this->blog;
+
+        if ($blog->status !== 'published' || blank($blog->publish_at)) {
+            return;
+        }
+
+        /** @var Carbon $publishedAt */
+        $publishedAt = $blog->publish_at;
+
+        if ($publishedAt->lt(now()->subWeek())) {
+            return;
+        }
+
+        if ($blog->todos()->exists()) {
+            return;
+        }
 
         /** @var Customer $customer */
         $customer = $blog->customer;

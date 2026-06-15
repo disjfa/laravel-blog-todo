@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['customer_id', 'title', 'slug', 'excerpt', 'content_markdown', 'status', 'publish_at', 'created_by', 'updated_by'])]
+#[Fillable(['customer_id', 'title', 'slug', 'excerpt', 'content_markdown', 'status', 'publish_at', 'external_url', 'created_by', 'updated_by'])]
 #[ObservedBy(BlogObserver::class)]
 class Blog extends Model
 {

@@ -5,8 +5,8 @@ namespace App\Filament\Resources\CustomerTodoTemplates\Tables;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 
 class CustomerTodoTemplatesTable
@@ -25,8 +25,7 @@ class CustomerTodoTemplatesTable
                     ->searchable(),
                 TextColumn::make('due_offset_iso8601')
                     ->searchable(),
-                IconColumn::make('is_active')
-                    ->boolean(),
+                ToggleColumn::make('is_active'),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

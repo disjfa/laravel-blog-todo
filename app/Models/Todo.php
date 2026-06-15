@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\EloquentSortable\Sortable;
 use Spatie\EloquentSortable\SortableTrait;
 
-#[Fillable(['customer_id', 'blog_id', 'platform_id', 'title', 'content_markdown', 'status', 'position', 'due_at', 'created_by', 'updated_by', 'generated_from_template_id'])]
+#[Fillable(['customer_id', 'blog_id', 'platform_id', 'title', 'content_markdown', 'external_url', 'status', 'position', 'due_at', 'created_by', 'updated_by', 'generated_from_template_id'])]
 class Todo extends Model implements Sortable
 {
     use HasFactory, HasUuids, SetsUserStamps, SortableTrait;

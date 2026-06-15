@@ -25,7 +25,8 @@ class CustomerAssetConnectionForm
                     ->columnSpanFull(),
                 Toggle::make('is_active')
                     ->required(),
-                DateTimePicker::make('last_validated_at'),
+                DateTimePicker::make('last_validated_at')
+                    ->native(false),
             ]);
     }
 }

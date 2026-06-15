@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Blogs;
 use App\Filament\Resources\Blogs\Pages\CreateBlog;
 use App\Filament\Resources\Blogs\Pages\EditBlog;
 use App\Filament\Resources\Blogs\Pages\ListBlogs;
+use App\Filament\Resources\Blogs\RelationManagers\TodosRelationManager;
 use App\Filament\Resources\Blogs\Schemas\BlogForm;
 use App\Filament\Resources\Blogs\Tables\BlogsTable;
 use App\Models\Blog;
@@ -38,7 +39,7 @@ class BlogResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            TodosRelationManager::class,
         ];
     }
 

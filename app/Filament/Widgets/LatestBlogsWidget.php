@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Enums\BlogStatus;
 use App\Filament\Concerns\ResolvesCustomerTenant;
 use App\Filament\Resources\Blogs\BlogResource;
 use App\Models\Blog;
@@ -31,20 +32,14 @@ class LatestBlogsWidget extends BaseWidget
                     ->latest()
             )
             ->columns([
+                TextColumn::make('status')
+                    ->badge()
+                    ->color(fn (string $state): string => BlogStatus::colorFor($state)),
+
                 TextColumn::make('title')
                     ->searchable()
                     ->limit(60)
                     ->url(fn (Blog $record): string => BlogResource::getUrl('edit', ['record' => $record])),
-
-                TextColumn::make('status')
-                    ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'draft' => 'gray',
-                        'published' => 'success',
-                        'scheduled' => 'info',
-                        'archived' => 'warning',
-                        default => 'gray',
-                    }),
 
                 TextColumn::make('publish_at')
                     ->label('Published')

@@ -259,6 +259,49 @@ Rules learned during implementation that apply to all future work on this projec
 - `User` implements `HasTenants`: admins get all customers via `Customer::all()`; others get `$this->customers`.
 - Resources that are NOT scoped to a tenant (Customer itself, User) must set `protected static bool $isScopedToTenant = false`.
 - `->authorizeWithPolicies()` is enabled on the panel. Filament calls policies for all CRUD actions. `viewAny` and `create` policy methods that take a `Customer` parameter must make it optional (`?Customer $customer = null`); when `null`, return `true` — tenancy already scopes the query.
+- **Filament v5 action imports**: actions are imported from `Filament\Actions\*` (not `Filament\Tables\Actions\*`). Table row actions use `->recordActions([])` and toolbar/bulk actions use `->toolbarActions([])`.
+- **Relation managers**: `form()` method signature is `form(Schema $schema): Schema` using `Filament\Schemas\Schema` — not `Filament\Forms\Form`. Share form fields via a static `MyForm::components()` array method reused across the resource and its relation managers.
+- **Page full width**: override `protected string|Width|null $maxContentWidth = Width::Full` using `Filament\Support\Enums\Width` — not a plain string.
+- **DateTimePicker**: always use `->native(false)` for a consistent custom UI across all form schemas.
+- **Status Select fields**: always use `->selectablePlaceholder(false)` with an explicit `->default()` so the field is never blank.
+- **Table column callbacks**: use `?string $state` closures instead of `$record` closures for `->url()`, `->visible()`, and `->color()` — accessing `$record` in these callbacks throws when the record is null during column header rendering.
+- **Badge colors**: always use Filament semantic tokens (`gray`, `info`, `warning`, `danger`, `success`), never raw Tailwind color names (`blue`, `red`, etc.).
+- **Status column ordering**: place the status badge column first in all resource tables and dashboard widgets.
+- **ToggleColumn**: use `Filament\Tables\Columns\ToggleColumn` for boolean fields that should be togglable inline — replaces `IconColumn::make()->boolean()`.
+
+#### Enums
+- `App\Enums\StatusColor` is the single source of truth for status/badge/kanban color tokens and their corresponding Tailwind classes.
+- Each domain status enum (e.g. `BlogStatus`, `TodoStatus`) must implement `color(): StatusColor` and `static colorFor(string $value): string` for use in Filament badge color closures.
+- `TodoStatus::kanbanColumns()` returns `header_color_classes` from `StatusColor::kanbanHeaderClasses()` — the Kanban Blade view must not hardcode a color map; it reads `$status['header_color_classes']` directly.
+- Validation rules should use `Rule::enum(StatusEnum::class)` rather than `Rule::in([...])` so adding a new case automatically extends validation.
+
+#### Migrations
+- Always implement both `up()` and `down()` with actual schema changes **before** running `php artisan migrate`. Never run a migration whose body is still the empty scaffold.
+- Verify the migration file content with `cat` or a file read before executing to catch empty scaffolds early.
+
+#### Code style
+- Run `./vendor/bin/pint` after every batch of changes.
+
+#### Eloquent best practices
+- Prefer `whereBelongsTo($model)` over manual foreign-key `where()` clauses when filtering by model relationships.
+- When creating connected models, prefer relation methods with `associate()` (for example `->blog()->associate($blog)`) instead of writing raw foreign key values directly.
+
+#### Frontend / Vite
+- Third-party JS libraries (e.g. FullCalendar) must be installed via npm and bundled through Vite — never use CDN `<script>` or `<link>` tags in production Blade views.
+- Add a dedicated entry file (e.g. `resources/js/fullcalendar.js`) that imports the library and assigns it to `window.*`, then register it in `vite.config.js`'s `input` array.
+- Import accompanying CSS inside the JS entry file (`import '../css/fullcalendar.css'`) so the stylesheet is bundled and injected automatically.
+
+#### FullCalendar
+- FullCalendar `saade/filament-fullcalendar` only supports Filament v2/v3 — do not install it; build pages manually with the npm packages `@fullcalendar/core`, `@fullcalendar/daygrid`, `@fullcalendar/timegrid`, `@fullcalendar/list`.
+- Dark mode: override FullCalendar's CSS custom properties (`--fc-*`) under `html.dark {}` to match Filament's Tailwind gray palette.
+- Week start: use `locale: FullCalendar.enGbLocale` (import `@fullcalendar/core/locales/en-gb`) instead of `firstDay: 1` — locale-driven first-day is reliable; `firstDay` alone can be ignored.
+- Width fix: always call `setTimeout(() => calendar.updateSize(), 50)` after `calendar.render()` and on `livewire:navigated` to force a correct size calculation after page layout paints.
+- Livewire integration: only `public` methods can be called from the frontend via `$wire.call()`. Separate data-fetch methods (`refreshEvents(): array`) from Filament's protected `getViewData()`.
+
+#### Observers / Automation
+- The `GenerateSocialTodosJob` is triggered in `BlogObserver::updated()`, not `created()`.
+- Dispatch conditions: blog must be `published`, `publish_at` must be set, and `publish_at` must not be older than one week.
+- The job itself also guards: skips if the blog already has any connected todos; idempotency per template is enforced via a unique check on `(blog_id, customer_id, generated_from_template_id)`.
 
 #### Authorization
 - Policy checks: controllers call `$this->authorize()` for the API; Filament calls policies automatically via `->authorizeWithPolicies()`.

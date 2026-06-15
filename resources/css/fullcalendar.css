@@ -1,0 +1,47 @@
+/* FullCalendar dark-mode overrides — mirrors Filament's Tailwind dark palette */
+/* Filament sets the `dark` class on <html> when dark mode is active             */
+
+html.dark {
+    /* Page / surface backgrounds */
+    --fc-page-bg-color: #111827;       /* gray-900 */
+    --fc-neutral-bg-color: #1f2937;    /* gray-800 */
+    --fc-non-business-color: rgba(55, 65, 81, 0.3); /* gray-700 @30% */
+
+    /* Borders */
+    --fc-border-color: #374151;        /* gray-700 */
+
+    /* Text */
+    --fc-neutral-text-color: #d1d5db;  /* gray-300 */
+
+    /* Today highlight */
+    --fc-today-bg-color: rgba(99, 102, 241, 0.10); /* indigo tint to match Filament primary */
+
+    /* Hover / selection highlight */
+    --fc-highlight-color: rgba(99, 102, 241, 0.15);
+
+    /* Event defaults (overridden per-event via color property) */
+    --fc-event-bg-color: #4f46e5;
+    --fc-event-border-color: #4338ca;
+    --fc-event-text-color: #ffffff;
+
+    /* "More" links */
+    --fc-more-link-bg-color: #374151;  /* gray-700 */
+    --fc-more-link-text-color: #d1d5db;/* gray-300 */
+
+    /* Now indicator */
+    --fc-now-indicator-color: #f87171; /* red-400 */
+
+    /* Toolbar buttons */
+    --fc-button-bg-color: #374151;         /* gray-700 */
+    --fc-button-border-color: #4b5563;     /* gray-600 */
+    --fc-button-text-color: #f9fafb;       /* gray-50 */
+    --fc-button-hover-bg-color: #4b5563;   /* gray-600 */
+    --fc-button-hover-border-color: #6b7280;
+    --fc-button-active-bg-color: #6366f1;  /* indigo-500 — Filament primary */
+    --fc-button-active-border-color: #4f46e5;
+}
+
+/* Make events show pointer cursor to indicate they are clickable */
+.fc-event {
+    cursor: pointer;
+}

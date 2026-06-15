@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Enums\TodoStatus;
 use App\Filament\Concerns\ResolvesCustomerTenant;
 use App\Filament\Resources\Todos\TodoResource;
 use App\Models\Todo;
@@ -36,21 +37,9 @@ class UpcomingTodosWidget extends BaseWidget
                     ->orderBy('due_at')
             )
             ->columns([
-                TextColumn::make('title')
-                    ->searchable()
-                    ->limit(60)
-                    ->url(fn (Todo $record): string => TodoResource::getUrl('edit', ['record' => $record])),
-
                 TextColumn::make('status')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'todo' => 'gray',
-                        'planned' => 'info',
-                        'in_progress' => 'warning',
-                        'blocked' => 'danger',
-                        'done' => 'success',
-                        default => 'gray',
-                    })
+                    ->color(fn (string $state): string => TodoStatus::colorFor($state))
                     ->formatStateUsing(fn (string $state): string => match ($state) {
                         'todo' => 'Todo',
                         'planned' => 'Planned',
@@ -59,6 +48,11 @@ class UpcomingTodosWidget extends BaseWidget
                         'done' => 'Done',
                         default => $state,
                     }),
+
+                TextColumn::make('title')
+                    ->searchable()
+                    ->limit(60)
+                    ->url(fn (Todo $record): string => TodoResource::getUrl('edit', ['record' => $record])),
 
                 TextColumn::make('platform.name')
                     ->label('Platform')

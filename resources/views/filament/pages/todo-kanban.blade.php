@@ -1,20 +1,9 @@
 <x-filament-panels::page>
     <div x-data wire:ignore.self class="flex overflow-x-auto overflow-y-hidden gap-4 pb-4 min-h-[70vh]">
         @foreach($statuses as $status)
-            @php
-                $colors = [
-                    'gray'   => 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300',
-                    'blue'   => 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300',
-                    'yellow' => 'bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300',
-                    'red'    => 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300',
-                    'green'  => 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300',
-                ];
-                $headerColor = $colors[$status['color']] ?? $colors['gray'];
-            @endphp
-
             <div class="w-80 flex-shrink-0 flex flex-col">
                 {{-- Column header --}}
-                <div class="flex items-center justify-between px-3 py-2 rounded-t-xl {{ $headerColor }} font-semibold text-sm">
+                <div class="flex items-center justify-between px-3 py-2 rounded-t-xl {{ $status['header_color_classes'] }} font-semibold text-sm">
                     <span>{{ $status['title'] }}</span>
                     <span class="text-xs font-normal opacity-70">{{ count($status['records']) }}</span>
                 </div>

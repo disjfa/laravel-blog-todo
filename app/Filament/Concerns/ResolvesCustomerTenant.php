@@ -19,4 +19,3 @@ trait ResolvesCustomerTenant
         return $tenant;
     }
 }
-

@@ -2,8 +2,10 @@
 
 namespace App\Filament\Resources\Blogs\Schemas;
 
+use App\Enums\BlogStatus;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\MarkdownEditor;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
@@ -30,10 +32,16 @@ class BlogForm
 
                 Section::make('Settings')
                     ->schema([
-                        TextInput::make('status')
+                        Select::make('status')
+                            ->options(BlogStatus::options())
+                            ->selectablePlaceholder(false)
                             ->required()
-                            ->default('draft'),
-                        DateTimePicker::make('publish_at'),
+                            ->default(BlogStatus::Draft->value),
+                        DateTimePicker::make('publish_at')
+                            ->native(false),
+                        TextInput::make('external_url')
+                            ->url()
+                            ->label(__('blog.label.external_url')),
                     ]),
             ]);
     }
