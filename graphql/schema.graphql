@@ -1,0 +1,171 @@
+"A datetime string with format `Y-m-d H:i:s`, e.g. `2018-05-23 13:43:32`."
+scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
+
+enum BlogStatus {
+    DRAFT @enum(value: "draft")
+    PUBLISHED @enum(value: "published")
+    ARCHIVED @enum(value: "archived")
+}
+
+enum TodoStatus {
+    TODO @enum(value: "todo")
+    PLANNED @enum(value: "planned")
+    IN_PROGRESS @enum(value: "in_progress")
+    BLOCKED @enum(value: "blocked")
+    DONE @enum(value: "done")
+}
+
+type Query {
+    me: User @guard(with: ["sanctum"]) @auth
+
+    "Admin only — UserPolicy@viewAny returns false for non-admins."
+    user(id: ID @eq, email: String @eq): User
+        @guard(with: ["sanctum"])
+        @canModel(ability: "view", model: "App\\Models\\User")
+        @find
+
+    "Admin only — UserPolicy@viewAny returns false for non-admins."
+    users: [User!]!
+        @guard(with: ["sanctum"])
+        @canModel(ability: "viewAny", model: "App\\Models\\User")
+        @paginate(defaultCount: 10)
+
+    customer(id: ID! @eq): Customer
+        @guard(with: ["sanctum"])
+        @canFind(ability: "view", find: "id")
+        @find
+
+    customers: [Customer!]!
+        @guard(with: ["sanctum"])
+        @whereAuth(relation: "users")
+        @paginate(defaultCount: 10)
+
+    allCustomers: [Customer!]!
+        @guard(with: ["sanctum"])
+        @canModel(ability: "viewAny", model: "App\\Models\\Customer")
+        @paginate(defaultCount: 10, model: "App\\Models\\Customer")
+
+    "BlogPolicy@view checks user has access to the blog's customer."
+    blog(id: ID! @eq): Blog
+        @guard(with: ["sanctum"])
+        @canFind(ability: "view", find: "id")
+        @find
+
+    "BlogPolicy@viewAny — any authenticated user can list (scoped via whereAuth on customer relation)."
+    blogs: [Blog!]!
+        @guard(with: ["sanctum"])
+        @canModel(ability: "viewAny", model: "App\\Models\\Blog")
+        @paginate(defaultCount: 10)
+
+    "TodoPolicy@view checks user has access to the todo's customer."
+    todo(id: ID! @eq): Todo
+        @guard(with: ["sanctum"])
+        @canFind(ability: "view", find: "id")
+        @find
+
+    "TodoPolicy@viewAny — any authenticated user can list."
+    todos: [Todo!]!
+        @guard(with: ["sanctum"])
+        @canModel(ability: "viewAny", model: "App\\Models\\Todo")
+        @paginate(defaultCount: 10)
+
+    "Admin only — PlatformPolicy@view returns false for non-admins."
+    platform(id: ID! @eq): Platform
+        @guard(with: ["sanctum"])
+        @canFind(ability: "view", find: "id")
+        @find
+
+    "Admin only — PlatformPolicy@viewAny returns false for non-admins."
+    platforms: [Platform!]!
+        @guard(with: ["sanctum"])
+        @canModel(ability: "viewAny", model: "App\\Models\\Platform")
+        @paginate(defaultCount: 10)
+}
+
+input MoveTodoInput {
+    status: TodoStatus
+    position: String!
+}
+
+type Mutation {
+    moveTodo(customerId: ID!, todoId: ID!, input: MoveTodoInput! @spread): Todo!
+        @guard(with: ["sanctum"])
+        @canFind(ability: "update", find: "todoId", model: "App\\Models\\Todo")
+        @field(resolver: "App\\GraphQL\\Mutations\\MoveTodo")
+}
+
+type User {
+    id: ID!
+    name: String!
+    email: String!
+    email_verified_at: DateTime
+    created_at: DateTime!
+    updated_at: DateTime!
+
+    customers: [Customer!]! @belongsToMany
+}
+
+type Customer {
+    id: ID!
+    name: String!
+    slug: String!
+    automation_enabled: Boolean!
+    created_at: DateTime!
+    updated_at: DateTime!
+
+    users: [User!]! @belongsToMany
+    platforms: [Platform!]! @belongsToMany
+    blogs: [Blog!]! @hasMany
+    todos: [Todo!]! @hasMany
+}
+
+type Blog {
+    id: ID!
+    title: String!
+    slug: String!
+    excerpt: String
+    content_markdown: String!
+    status: BlogStatus!
+    publish_at: DateTime
+    external_url: String
+    created_by: ID
+    updated_by: ID
+    created_at: DateTime!
+    updated_at: DateTime!
+
+    customer: Customer! @belongsTo
+    author: User @belongsTo
+    todos: [Todo!]! @hasMany
+}
+
+type Todo {
+    id: ID!
+    title: String!
+    content_markdown: String
+    external_url: String
+    status: TodoStatus!
+    position: Int!
+    due_at: DateTime
+    created_by: ID
+    updated_by: ID
+    generated_from_template_id: ID
+    created_at: DateTime!
+    updated_at: DateTime!
+
+    customer: Customer! @belongsTo
+    blog: Blog @belongsTo
+    platform: Platform @belongsTo
+    creator: User @belongsTo
+}
+
+type Platform {
+    id: ID!
+    name: String!
+    slug: String!
+    is_active: Boolean!
+    created_at: DateTime!
+    updated_at: DateTime!
+
+    customers: [Customer!]! @belongsToMany
+    todos: [Todo!]! @hasMany
+}
