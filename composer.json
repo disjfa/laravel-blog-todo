@@ -13,6 +13,8 @@
         "laravel/framework": "^13.8",
         "laravel/sanctum": "^4.3",
         "laravel/tinker": "^3.0",
+        "league/flysystem-aws-s3-v3": "^3.35",
+        "league/flysystem-ftp": "^3.31",
         "nuwave/lighthouse": "^6.67",
         "spatie/eloquent-sortable": "^5.0",
         "spatie/laravel-permission": "^7.4",
@@ -62,18 +64,20 @@
         "format": [
             "@php vendor/bin/pint"
         ],
+        "phpstan": [
+            "@php vendor/bin/phpstan analyse --memory-limit=1G"
+        ],
         "pint": [
             "@php vendor/bin/pint --test"
         ],
         "pre-commit": [
+            "@phpstan",
             "@format",
             "@pint",
             "@test"
         ],
         "docs": [
-            "./vendor/bin/openapi app/OpenApi app/Http/Controllers/Api --output public/api-docs.json --format json"
-        ],
-        "post-autoload-dump": [
+            "./vendor/bin/openapi app/OpenApi app/Http/Controllers/Api --output public/api-docs.json --format json",
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi",
             "@php artisan filament:upgrade"
