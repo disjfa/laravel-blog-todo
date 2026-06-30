@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\CustomerAssets\Schemas;
 
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
@@ -13,30 +13,41 @@ class CustomerAssetForm
     {
         return $schema
             ->components([
-                TextInput::make('uploaded_by')
-                    ->default(null),
                 Select::make('connection_id')
-                    ->relationship('connection', 'id')
-                    ->required(),
-                TextInput::make('disk_driver')
-                    ->required(),
-                TextInput::make('path')
-                    ->default(null),
-                Textarea::make('public_url')
-                    ->default(null)
-                    ->columnSpanFull(),
-                TextInput::make('provider_asset_id')
-                    ->default(null),
-                TextInput::make('filename')
-                    ->required(),
-                TextInput::make('mime_type')
-                    ->required(),
-                TextInput::make('size_bytes')
+                    ->relationship(
+                        'connection',
+                        'name',
+                        fn ($query) => $query->whereBelongsTo(filament()->getTenant(), 'customer'),
+                    )
                     ->required()
-                    ->numeric(),
-                Textarea::make('meta')
-                    ->default(null)
+                    ->disabled(fn (string $operation): bool => $operation === 'edit'),
+
+                FileUpload::make('upload')
+                    ->label('File')
+                    ->storeFiles(false)
+                    ->required(fn (string $operation): bool => $operation === 'create')
+                    ->visible(fn (string $operation): bool => $operation === 'create')
                     ->columnSpanFull(),
+
+                TextInput::make('filename')
+                    ->disabled()
+                    ->visible(fn (string $operation): bool => $operation === 'edit'),
+                TextInput::make('mime_type')
+                    ->disabled()
+                    ->visible(fn (string $operation): bool => $operation === 'edit'),
+                TextInput::make('size_bytes')
+                    ->disabled()
+                    ->numeric()
+                    ->visible(fn (string $operation): bool => $operation === 'edit'),
+                TextInput::make('disk_driver')
+                    ->disabled()
+                    ->visible(fn (string $operation): bool => $operation === 'edit'),
+                TextInput::make('path')
+                    ->disabled()
+                    ->visible(fn (string $operation): bool => $operation === 'edit'),
+                TextInput::make('provider_asset_id')
+                    ->disabled()
+                    ->visible(fn (string $operation): bool => $operation === 'edit'),
             ]);
     }
 }

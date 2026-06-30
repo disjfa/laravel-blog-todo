@@ -15,6 +15,8 @@ class CustomerAssetConnectionsTable
     {
         return $table
             ->columns([
+                TextColumn::make('name')
+                    ->searchable(),
                 TextColumn::make('customer.name')
                     ->searchable(),
                 TextColumn::make('driver')
