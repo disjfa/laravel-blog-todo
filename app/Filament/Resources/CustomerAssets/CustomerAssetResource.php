@@ -20,6 +20,8 @@ class CustomerAssetResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPhoto;
 
+    protected static bool $isScopedToTenant = true;
+
     public static function getNavigationGroup(): ?string
     {
         return 'Customer';

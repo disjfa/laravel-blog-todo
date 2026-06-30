@@ -13,7 +13,11 @@ use Filament\Pages\Page;
 use Filament\Support\Enums\Width;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Collection;
+use Laravel\Sanctum\PersonalAccessToken;
 
+/**
+ * @property-read Collection<int, PersonalAccessToken> $tokens
+ */
 class ApiTokens extends Page
 {
     protected static bool $isDiscovered = false;

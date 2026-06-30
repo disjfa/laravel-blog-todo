@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\AssetDriver;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['customer_id', 'driver', 'config_encrypted', 'is_active', 'last_validated_at'])]
+#[Fillable(['customer_id', 'name', 'driver', 'config_encrypted', 'is_active', 'last_validated_at'])]
 #[Hidden(['config_encrypted'])]
 class CustomerAssetConnection extends Model
 {
@@ -20,7 +21,8 @@ class CustomerAssetConnection extends Model
         return [
             'is_active' => 'boolean',
             'last_validated_at' => 'datetime',
-            'config_encrypted' => 'encrypted',
+            'config_encrypted' => 'encrypted:array',
+            'driver' => AssetDriver::class,
         ];
     }
 
@@ -32,5 +34,10 @@ class CustomerAssetConnection extends Model
     public function assets(): HasMany
     {
         return $this->hasMany(CustomerAsset::class, 'connection_id');
+    }
+
+    public function getDecryptedConfig(): array
+    {
+        return $this->config_encrypted ?? [];
     }
 }

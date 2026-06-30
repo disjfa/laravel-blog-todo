@@ -7,6 +7,7 @@ use App\Filament\Concerns\ResolvesCustomerTenant;
 use App\Filament\Resources\Todos\Schemas\TodoForm;
 use App\Models\Todo;
 use BackedEnum;
+use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Pages\Page;
 use Filament\Schemas\Schema;
@@ -81,12 +82,21 @@ class TodoCalendar extends Page
             ->where('status', '!=', 'done')
             ->with('platform')
             ->get()
-            ->map(fn (Todo $todo): array => [
-                'id' => $todo->id,
-                'title' => ($todo->platform ? '['.$todo->platform->name.'] ' : '').$todo->title,
-                'start' => $todo->due_at->toIso8601String(),
-                'color' => $this->hexForStatus($todo->status),
-            ]);
+            ->map(function ($todo): array {
+                /** @var Todo $todo */
+                $dueAt = Carbon::parse($todo->due_at);
+
+                $platformName = data_get($todo, 'platform.name');
+
+                return [
+                    'id' => $todo->id,
+                    'title' => (filled($platformName) ? '['.$platformName.'] ' : '').$todo->title,
+                    'start' => $dueAt->toAtomString(),
+                    'color' => $this->hexForStatus($todo->status),
+                ];
+            })
+            ->filter(fn (array $event): bool => filled($event['start']))
+            ->values();
     }
 
     private function hexForStatus(string $status): string

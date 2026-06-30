@@ -312,6 +312,17 @@ Rules learned during implementation that apply to all future work on this projec
 - All other domain models (customers, blogs, todos, platforms, templates, assets, connections) use UUID primary keys via `HasUuids`.
 - Pure pivot tables use bigint `id` for internal join efficiency.
 
+#### Assets / Connections
+- `CustomerAssetConnection` is tenant-scoped in Filament. Do not expose `customer_id` in the form; tenant route context provides ownership.
+- For `CustomerAssetConnection` tenancy mapping, set resource relationship names explicitly: ownership is `customer`, tenant-side relation is `assetConnection`.
+- `CustomerAssetConnection` includes a required human-readable `name` and all asset selectors should use `connection.name` instead of raw IDs.
+- `CustomerAssetConnection` has a `Test connection` action on the **edit** page only (not create).
+- `CustomerAsset` create form is minimal: `connection_id` + file `upload` only. All other metadata is derived after upload.
+- `CustomerAsset` metadata is auto-populated from the uploaded file and driver response (`disk_driver`, `path`, `provider_asset_id`, `filename`, `mime_type`, `size_bytes`, `meta`, `uploaded_by`).
+- `customer_assets.public_url` is not persisted; URL is derived at runtime via `CustomerAsset::publicUrl()` + `AssetDriverFactory::buildUrl()`.
+- `CustomerAssets` table image preview must use an explicit runtime state callback (not a DB column binding) and clicking the image copies the resolved URL to clipboard.
+- Cloudinary base public URL is generated with a `CommonTransformation`: crop fill, aspect ratio 16:9, width 1280.
+
 #### Code style
 - Run `./vendor/bin/pint` after every batch of changes.
 

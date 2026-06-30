@@ -27,4 +27,3 @@ class MoveTodo
         return $todo->fresh(['blog', 'platform', 'creator']);
     }
 }
-

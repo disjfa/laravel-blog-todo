@@ -20,7 +20,11 @@ class CustomerAssetConnectionResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedLink;
 
-    protected static bool $isScopedToTenant = false;
+    protected static bool $isScopedToTenant = true;
+
+    protected static ?string $tenantOwnershipRelationshipName = 'customer';
+
+    protected static ?string $tenantRelationshipName = 'assetConnection';
 
     public static function getNavigationGroup(): ?string
     {
