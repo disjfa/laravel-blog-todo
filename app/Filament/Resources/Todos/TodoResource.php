@@ -38,7 +38,6 @@ class TodoResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
         ];
     }
 

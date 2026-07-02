@@ -2,8 +2,10 @@
 
 namespace App\Policies;
 
+use App\Models\Customer;
 use App\Models\CustomerAssetConnection;
 use App\Models\User;
+use Filament\Facades\Filament;
 
 class CustomerAssetConnectionPolicy
 {
@@ -12,28 +14,32 @@ class CustomerAssetConnectionPolicy
         return $user->hasRole('admin') ? true : null;
     }
 
-    public function viewAny(User $user): bool
+    public function viewAny(User $user, ?Customer $customer = null): bool
     {
-        return false;
+        $customer ??= Filament::getTenant();
+
+        return $user->customers->contains($customer);
     }
 
     public function view(User $user, CustomerAssetConnection $connection): bool
     {
-        return false;
+        return $user->customers->contains($connection->customer);
     }
 
-    public function create(User $user): bool
+    public function create(User $user, ?Customer $customer = null): bool
     {
-        return false;
+        $customer ??= Filament::getTenant();
+
+        return $user->customers->contains($customer);
     }
 
     public function update(User $user, CustomerAssetConnection $connection): bool
     {
-        return false;
+        return $user->customers->contains($connection->customer);
     }
 
     public function delete(User $user, CustomerAssetConnection $connection): bool
     {
-        return false;
+        return $user->customers->contains($connection->customer);
     }
 }

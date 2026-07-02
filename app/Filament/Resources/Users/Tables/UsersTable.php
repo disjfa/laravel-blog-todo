@@ -30,7 +30,6 @@ class UsersTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
             ])
             ->recordActions([
                 Impersonate::make()->redirectTo('/admin'),

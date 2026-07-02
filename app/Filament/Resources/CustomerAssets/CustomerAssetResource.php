@@ -27,6 +27,21 @@ class CustomerAssetResource extends Resource
         return 'Customer';
     }
 
+    public static function getNavigationLabel(): string
+    {
+        return 'Assets';
+    }
+
+    public static function getModelLabel(): string
+    {
+        return 'asset';
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return 'assets';
+    }
+
     public static function form(Schema $schema): Schema
     {
         return CustomerAssetForm::configure($schema);
@@ -40,7 +55,6 @@ class CustomerAssetResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
         ];
     }
 

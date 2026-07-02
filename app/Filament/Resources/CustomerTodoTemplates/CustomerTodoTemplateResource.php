@@ -26,6 +26,21 @@ class CustomerTodoTemplateResource extends Resource
         return 'Customer';
     }
 
+    public static function getNavigationLabel(): string
+    {
+        return 'Todo Templates';
+    }
+
+    public static function getModelLabel(): string
+    {
+        return 'todo template';
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return 'todo templates';
+    }
+
     public static function getNavigationBadge(): ?string
     {
         $tenant = Filament::getTenant();
@@ -53,7 +68,6 @@ class CustomerTodoTemplateResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
         ];
     }
 

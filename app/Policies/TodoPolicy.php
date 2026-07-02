@@ -5,6 +5,7 @@ namespace App\Policies;
 use App\Models\Customer;
 use App\Models\Todo;
 use App\Models\User;
+use Filament\Facades\Filament;
 
 class TodoPolicy
 {
@@ -15,9 +16,7 @@ class TodoPolicy
 
     public function viewAny(User $user, ?Customer $customer = null): bool
     {
-        if ($customer === null) {
-            return true;
-        }
+        $customer ??= Filament::getTenant();
 
         return $user->customers->contains($customer);
     }
@@ -29,9 +28,7 @@ class TodoPolicy
 
     public function create(User $user, ?Customer $customer = null): bool
     {
-        if ($customer === null) {
-            return true;
-        }
+        $customer ??= Filament::getTenant();
 
         return $user->customers->contains($customer);
     }
