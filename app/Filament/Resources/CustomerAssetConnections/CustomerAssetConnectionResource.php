@@ -9,6 +9,7 @@ use App\Filament\Resources\CustomerAssetConnections\Schemas\CustomerAssetConnect
 use App\Filament\Resources\CustomerAssetConnections\Tables\CustomerAssetConnectionsTable;
 use App\Models\CustomerAssetConnection;
 use BackedEnum;
+use Filament\Facades\Filament;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -28,7 +29,35 @@ class CustomerAssetConnectionResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Admin Area';
+        return 'Customer';
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return 'Asset Connections';
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        $tenant = Filament::getTenant();
+
+        if (! $tenant) {
+            return null;
+        }
+
+        return (string) CustomerAssetConnection::query()
+            ->whereBelongsTo($tenant)
+            ->count();
+    }
+
+    public static function getModelLabel(): string
+    {
+        return 'asset connection';
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return 'asset connections';
     }
 
     public static function form(Schema $schema): Schema
@@ -44,7 +73,6 @@ class CustomerAssetConnectionResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
         ];
     }
 

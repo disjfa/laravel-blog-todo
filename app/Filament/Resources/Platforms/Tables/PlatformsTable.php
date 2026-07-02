@@ -29,7 +29,6 @@ class PlatformsTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
             ])
             ->recordActions([
                 EditAction::make(),

@@ -5,6 +5,7 @@ namespace App\Policies;
 use App\Models\Blog;
 use App\Models\Customer;
 use App\Models\User;
+use Filament\Facades\Filament;
 
 class BlogPolicy
 {
@@ -15,9 +16,7 @@ class BlogPolicy
 
     public function viewAny(User $user, ?Customer $customer = null): bool
     {
-        if ($customer === null) {
-            return true;
-        }
+        $customer ??= Filament::getTenant();
 
         return $user->customers->contains($customer);
     }
@@ -29,9 +28,7 @@ class BlogPolicy
 
     public function create(User $user, ?Customer $customer = null): bool
     {
-        if ($customer === null) {
-            return true;
-        }
+        $customer ??= Filament::getTenant();
 
         return $user->customers->contains($customer);
     }

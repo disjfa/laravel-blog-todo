@@ -36,7 +36,6 @@ class CustomerTodoTemplatesTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
             ])
             ->recordActions([
                 EditAction::make(),

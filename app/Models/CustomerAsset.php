@@ -52,33 +52,18 @@ class CustomerAsset extends Model
     protected function publicUrl(): Attribute
     {
         return Attribute::make(
-            get: function (?string $value): ?string {
-                // Keep supporting any previously persisted value.
-                if (filled($value)) {
-                    return $value;
-                }
-
-                // Legacy fallback: some older rows may have stored a URL in `path`.
-                if (is_string($this->path) && str_starts_with($this->path, 'http')) {
-                    return $this->path;
-                }
-
+            get: function (): ?string {
                 $identifier = $this->provider_asset_id ?: $this->path;
-
                 if (blank($identifier)) {
                     return null;
                 }
-
                 $connection = $this->connection;
-
                 if (! $connection instanceof CustomerAssetConnection && filled($this->connection_id)) {
                     $connection = CustomerAssetConnection::query()->find($this->connection_id);
                 }
-
                 if (! $connection instanceof CustomerAssetConnection) {
                     return null;
                 }
-
                 try {
                     return AssetDriverFactory::buildUrl($connection, $identifier);
                 } catch (Throwable) {

@@ -5,6 +5,7 @@ namespace App\Policies;
 use App\Models\Customer;
 use App\Models\CustomerAsset;
 use App\Models\User;
+use Filament\Facades\Filament;
 
 class CustomerAssetPolicy
 {
@@ -13,9 +14,11 @@ class CustomerAssetPolicy
         return $user->hasRole('admin') ? true : null;
     }
 
-    public function viewAny(User $user): bool
+    public function viewAny(User $user, ?Customer $customer = null): bool
     {
-        return (bool) $user->hasRole(['admin', 'customer']);
+        $customer ??= Filament::getTenant();
+
+        return $user->customers->contains($customer);
     }
 
     public function view(User $user, CustomerAsset $asset): bool
@@ -23,8 +26,10 @@ class CustomerAssetPolicy
         return $user->customers->contains($asset->customer);
     }
 
-    public function create(User $user, Customer $customer): bool
+    public function create(User $user, ?Customer $customer = null): bool
     {
+        $customer ??= Filament::getTenant();
+
         return $user->customers->contains($customer);
     }
 
